@@ -1,5 +1,6 @@
 #include "MEM/mem.h"
 #include "CPU/cpu.h"
+#include <iostream>
 
 int main(){
 

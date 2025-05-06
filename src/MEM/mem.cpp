@@ -1,7 +1,6 @@
 #include "mem.h"
 
 MEM::MEM(RAM& ram, GPU& gpu) : ram(ram), gpu(gpu) {}
-MEM::MEM(RAM& ram) : ram(ram), gpu(GPU()) {}
 
 Device* MEM::get_device(uint32_t address) {
 
