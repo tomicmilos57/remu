@@ -44,6 +44,12 @@ void CPU::info_instruction_number(){
   std::cout << std::dec << "instruction number: " << instruction_number << std::endl;
 }
 
+void CPU::info_unpriv_test(){
+  for (int i = 0; i <= 64; ++i) {
+    std::cout << "TEST " << std::dec << i << ": 0x" << std::hex << std::setw(8) << std::setfill('0') << memory.fetch_word(0x60000000 + i) << std::endl;
+  }
+}
+
 void CPU::execute_instruction(instruction inst){
 
   uint32_t rs1 = (ir >> 15) & 0x1F;

@@ -14,6 +14,7 @@ public:
   void info_pc();
   void info_ir();
   void info_instruction_number();
+  void info_unpriv_test(); // EXPECTS MEMORY ON ADDRESS 0x60000000
 
 private:
   enum instruction {
