@@ -1,14 +1,19 @@
 #include "mem.h"
+#include <iostream>
+#include <iomanip>
 
 MEM::MEM(RAM& ram, GPU& gpu) : ram(ram), gpu(gpu) {}
 
 Device* MEM::get_device(uint32_t address) {
 
-  if (address >= 0x80000000 && address < 0x90000000)
+  if (address >= 0x00000000 && address < 0x90000000)
     return &ram;
   if (address >= 0x20000000 && address < 0x30000000)
     return &gpu;
 
+  std::cout << "MEMORY ACCESS FAULT" << std::endl;
+  std::cout << "Address: 0x" << std::hex << std::setw(8) << std::setfill('0') << address <<  std::endl;
+  exit(404);
   return nullptr;
 }
 

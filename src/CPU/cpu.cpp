@@ -1,15 +1,46 @@
 #include "cpu.h"
+#include <iostream>
+#include <iomanip>
 
 CPU::CPU(MEM& memory) : memory(memory) {}
 
 
 bool CPU::execute(){
   this->ir = memory.fetch_word(this->pc);
+  instruction_number++;
 
   CPU::instruction inst = decode_instruction();
+  regfile[0] = 0;
   execute_instruction(inst);
+  regfile[0] = 0;
  
   return true;
+}
+
+void CPU::info_registers(){
+
+    std::cout << "PC: 0x"
+              << std::hex << std::setw(8) << std::setfill('0') << pc << std::endl;
+
+    std::cout << "IR: 0x"
+              << std::hex << std::setw(8) << std::setfill('0') << ir << std::endl;
+
+    for (int i = 0; i < 32; ++i) {
+    std::cout << "x" << std::setw(2) << std::setfill('0') << i << ": 0x"
+      << std::hex << std::setw(8) << std::setfill('0') << regfile[i]
+      << std::dec << std::endl;
+  }
+}
+
+void CPU::info_pc(){
+  std::cout << "PC: 0x" << std::hex << std::setw(8) << std::setfill('0') << pc << std::endl;
+}
+void CPU::info_ir(){
+  std::cout << "IR: 0x" << std::hex << std::setw(8) << std::setfill('0') << ir << std::endl;
+}
+
+void CPU::info_instruction_number(){
+  std::cout << std::dec << "instruction number: " << instruction_number << std::endl;
 }
 
 void CPU::execute_instruction(instruction inst){
@@ -20,6 +51,8 @@ void CPU::execute_instruction(instruction inst){
 
 	uint32_t imm = ir >> 20;
 	int32_t imm_se = imm | (( imm & 0x800 )?0xfffff000:0);
+	uint32_t imm_store = ( ( ir >> 7 ) & 0x1f ) | ( ( ir & 0xfe000000 ) >> 20 );
+	if( imm_store & 0x800 ) imm_store |= 0xfffff000;
 
 	uint32_t imm_branch = ((ir & 0xf00)>>7) | ((ir & 0x7e000000)>>20) | ((ir & 0x80) << 4) | ((ir >> 31)<<12);
 	if( imm_branch & 0x1000 ) imm_branch |= 0xffffe000;
@@ -62,13 +95,13 @@ void CPU::execute_instruction(instruction inst){
       }
     case CPU::i_lh:
       {
-        regfile[rd] = static_cast<int32_t>(static_cast<int16_t>(memory.fetch_byte(regfile[rs1] + imm_se)));
+        regfile[rd] = static_cast<int32_t>(static_cast<int16_t>(memory.fetch_half(regfile[rs1] + imm_se)));
         pc += 4;
         break;
       }
     case CPU::i_lw:
       {
-        regfile[rd] = static_cast<int32_t>(memory.fetch_byte(regfile[rs1] + imm_se));
+        regfile[rd] = static_cast<int32_t>(memory.fetch_word(regfile[rs1] + imm_se));
         pc += 4;
         break;
       }
@@ -80,7 +113,7 @@ void CPU::execute_instruction(instruction inst){
       }
     case CPU::i_lhu:
       {
-        regfile[rd] = static_cast<int32_t>(memory.fetch_byte(regfile[rs1] + imm_se));
+        regfile[rd] = static_cast<int32_t>(memory.fetch_half(regfile[rs1] + imm_se));
         pc += 4;
         break;
       }
@@ -206,54 +239,66 @@ void CPU::execute_instruction(instruction inst){
       {
         if(regfile[rs1] == regfile[rs2])
           pc += imm_branch;
+        else 
+          pc += 4;
         break;
       }
     case CPU::i_bne:
       {
         if(regfile[rs1] != regfile[rs2])
           pc += imm_branch;
+        else 
+          pc += 4;
         break;
       }
     case CPU::i_blt:
       {
         if(static_cast<int32_t>(regfile[rs1]) < static_cast<int32_t>(regfile[rs2]))
           pc += imm_branch;
+        else 
+          pc += 4;
         break;
       }
     case CPU::i_bge:
       {
         if(static_cast<int32_t>(regfile[rs1]) >= static_cast<int32_t>(regfile[rs2]))
           pc += imm_branch;
+        else 
+          pc += 4;
         break;
       }
     case CPU::i_bltu:
       {
         if(regfile[rs1] < regfile[rs2])
           pc += imm_branch;
+        else 
+          pc += 4;
         break;
       }
     case CPU::i_bgeu:
       {
         if(regfile[rs1] >= regfile[rs2])
           pc += imm_branch;
+        else 
+          pc += 4;
         break;
       }
   
     case CPU::i_sb:
       {
-        memory.store_byte(regfile[rs1] + imm_se, regfile[rs2] & 0xFF);
+        memory.store_byte(regfile[rs1] + imm_store, regfile[rs2] & 0xFF);
         pc += 4;
         break;
       }
     case CPU::i_sh:
       {
-        memory.store_byte(regfile[rs1] + imm_se, regfile[rs2] & 0xFFFF);
+        memory.store_half(regfile[rs1] + imm_store, regfile[rs2] & 0xFFFF);
         pc += 4;
         break;
       }
     case CPU::i_sw:
       {
-        memory.store_byte(regfile[rs1] + imm_se, regfile[rs2]);
+        memory.store_word(regfile[rs1] + imm_store, regfile[rs2]);
         pc += 4;
         break;
       }

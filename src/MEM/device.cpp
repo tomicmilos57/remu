@@ -6,7 +6,7 @@ RAM::RAM(int size, std::string filename){
   //Allocate RAM memory
   this->memory = new uint8_t[size];
   this->size = size;
-  this->base = 0x80000000;
+  this->base = 0x00000000;
 
   //Open bin file
   std::ifstream file(filename, std::ios::binary);

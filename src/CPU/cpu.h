@@ -8,6 +8,10 @@ class CPU {
 public:
   CPU(MEM& memory);
   bool execute();
+  void info_registers();
+  void info_pc();
+  void info_ir();
+  void info_instruction_number();
 
 private:
   enum instruction {
@@ -24,10 +28,11 @@ private:
   };
 
   MEM& memory;
-  uint32_t pc;
-  uint32_t ir;
+  uint32_t pc = 0x00000000;
+  uint32_t ir = 0;
+  uint32_t instruction_number = 0;
 
-  uint32_t regfile[32];
+  uint32_t regfile[32] = {};
 
   instruction decode_instruction();
   void execute_instruction(instruction inst);

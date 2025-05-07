@@ -17,8 +17,8 @@ struct Device {
     virtual ~Device();
   protected:
     uint8_t *memory;
-    int size;
-    uint32_t base;
+    int size = 0;
+    uint32_t base = 0;
 };
 
 class RAM : public Device{
