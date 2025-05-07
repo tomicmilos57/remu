@@ -7,6 +7,8 @@ class CPU {
 
 public:
   CPU(MEM& memory);
+  CPU(MEM& memory, uint32_t pc);
+
   bool execute();
   void info_registers();
   void info_pc();

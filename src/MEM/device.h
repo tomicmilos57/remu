@@ -14,6 +14,8 @@ struct Device {
     virtual void store_half(uint32_t address, uint16_t value);
     virtual void store_word(uint32_t address, uint32_t value);
 
+    uint32_t get_base();
+    int get_size();
     virtual ~Device();
   protected:
     uint8_t *memory;
@@ -23,7 +25,8 @@ struct Device {
 
 class RAM : public Device{
   public:
-    RAM(int size, std::string filename);
+    RAM(int size, std::string filename, uint32_t base);
+    RAM(int size, uint32_t base);
 
   private:
 };
@@ -31,8 +34,8 @@ class RAM : public Device{
 
 class GPU : public Device{
   public:
-    GPU();
-    GPU(std::string filename);
+    GPU(uint32_t base);
+    GPU(std::string filename, uint32_t base);
 
   private:
 };

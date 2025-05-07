@@ -1,12 +1,13 @@
 #ifndef MEM_h
 #define MEM_h
 #include <cstdint>
+#include <vector>
 #include "device.h"
 
 class MEM {
 
 public:
-  MEM(RAM& ram, GPU& gpu);
+  void register_device(Device& dev);
 
   uint8_t fetch_byte(uint32_t address);
   uint16_t fetch_half(uint32_t address);
@@ -17,9 +18,7 @@ public:
   void store_word(uint32_t address, uint32_t word);
 
 private:
-  RAM& ram; //0x8000_0000
-  GPU& gpu; //0x2000_0000
-  
+  std::vector<Device*> registered_devices;
   Device* get_device(uint32_t address);
 };
 

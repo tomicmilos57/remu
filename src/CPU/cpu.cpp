@@ -3,6 +3,7 @@
 #include <iomanip>
 
 CPU::CPU(MEM& memory) : memory(memory) {}
+CPU::CPU(MEM& memory, uint32_t pc) : memory(memory), pc(pc) {}
 
 
 bool CPU::execute(){

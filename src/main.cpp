@@ -4,13 +4,15 @@
 
 int main(){
 
-  RAM ram(8*1024*1024, "misc/01_fib.bin");
-  GPU gpu;
-  MEM mem_map(ram, gpu);
-  CPU cpu(mem_map);
+  RAM ram(8*1024*1024, "misc/test.bin", 0x00000000);
+  GPU gpu(0x20000000);
+  MEM mem_map;
+  mem_map.register_device(ram);
+  mem_map.register_device(gpu);
+  CPU cpu(mem_map, 0x00000000);
 
   int count = 0;
-  while (count < 150) {
+  while (count < 16200) {
     cpu.execute();
     std::cout << "Instruction number: ";
     //cpu.info_pc();

@@ -1,12 +1,12 @@
 #include "device.h"
 #include <iostream>
 
-RAM::RAM(int size, std::string filename){
+RAM::RAM(int size, std::string filename, uint32_t base){
 
   //Allocate RAM memory
   this->memory = new uint8_t[size];
   this->size = size;
-  this->base = 0x00000000;
+  this->base = base;
 
   //Open bin file
   std::ifstream file(filename, std::ios::binary);
@@ -22,22 +22,30 @@ RAM::RAM(int size, std::string filename){
 
 }
 
-GPU::GPU(){
-  int size = 16 * 1024;
+RAM::RAM(int size, uint32_t base){
 
-  //Allocate GPU memory
+  //Allocate RAM memory
   this->memory = new uint8_t[size];
   this->size = size;
-  this->base = 0x20000000;
+  this->base = base;
 }
 
-GPU::GPU(std::string filename){
+GPU::GPU(uint32_t base){
   int size = 16 * 1024;
 
   //Allocate GPU memory
   this->memory = new uint8_t[size];
   this->size = size;
-  this->base = 0x20000000;
+  this->base = base;
+}
+
+GPU::GPU(std::string filename, uint32_t base){
+  int size = 16 * 1024;
+
+  //Allocate GPU memory
+  this->memory = new uint8_t[size];
+  this->size = size;
+  this->base = base;
 
   //Open bin file
   std::ifstream file(filename, std::ios::binary);
@@ -51,6 +59,14 @@ GPU::GPU(std::string filename){
   //Read bin file inside memory
   if (!file.read(reinterpret_cast<char*>(memory), filesize)) throw std::runtime_error("Error reading file.");
 
+}
+
+uint32_t Device::get_base(){
+  return base;
+}
+
+int Device::get_size(){
+  return size;
 }
 
 Device::~Device(){
