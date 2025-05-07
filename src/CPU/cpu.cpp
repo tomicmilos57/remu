@@ -45,8 +45,25 @@ void CPU::info_instruction_number(){
 }
 
 void CPU::info_unpriv_test(){
-  for (int i = 0; i <= 64; ++i) {
-    std::cout << "TEST " << std::dec << i << ": 0x" << std::hex << std::setw(8) << std::setfill('0') << memory.fetch_word(0x60000000 + i) << std::endl;
+  const char* test_names[] = {
+    "add", "addi", "and", "andi", "auipc", "beq", "bge", "bgeu", "blt", "bltu",
+    "bne", "div", "divu", "j", "jal", "jalr", "lb", "lbu", "lh", "lhu", "lui",
+    "lw", "mul", "mulh", "mulhsu", "mulhu", "or", "ori", "rem", "remu", "sb",
+    "sh", "simple", "sll", "slli", "slt", "slti", "sra", "srai", "srl", "srli",
+    "sub", "sw", "xor", "xori", "csrr", "csrw", "csrs", "csrrw", "csrrs",
+    "mret", "sret", "ecall", "ebreak", "fence", "fence.i", "wfi", "sfence.vma",
+    "illegal", "nop", "custom0", "custom1", "custom2", "custom3", "custom4"
+  };
+
+  for (int i = 0; i <= 44; ++i) {
+    uint32_t result = memory.fetch_word(0x60000000 + i);
+
+    std::string passed = "FAILED ";
+    if(result & 0x1)
+      passed = "PASSED ";
+
+    std::cout << "TEST " << std::dec << i  << " " << test_names[i] << " " << passed << ": 0x" << std::hex << std::setw(8) << std::setfill('0') << memory.fetch_word(0x60000000 + i) << std::endl;
+
   }
 }
 
@@ -164,19 +181,19 @@ void CPU::execute_instruction(instruction inst){
   
     case CPU::i_slli:
       {
-        regfile[rd] = regfile[rs1] << rs2 & 0x1F;
+        regfile[rd] = regfile[rs1] << (rs2 & 0x1F);
         pc += 4;
         break;
       }
     case CPU::i_srli:
       {
-        regfile[rd] = regfile[rs1] >> rs2 & 0x1F;
+        regfile[rd] = regfile[rs1] >> (rs2 & 0x1F);
         pc += 4;
         break;
       }
     case CPU::i_srai:
       {
-        regfile[rd] = static_cast<int32_t>(regfile[rs1]) >> rs2 & 0x1F;
+        regfile[rd] = static_cast<int32_t>(regfile[rs1]) >> (rs2 & 0x1F);
         pc += 4;
         break;
       }
@@ -195,7 +212,7 @@ void CPU::execute_instruction(instruction inst){
       }
     case CPU::i_sll:
       {
-        regfile[rd] = regfile[rs1] << regfile[rs2] & 0x1F;
+        regfile[rd] = regfile[rs1] << (regfile[rs2] & 0x1F);
         pc += 4;
         break;
       }
@@ -219,13 +236,13 @@ void CPU::execute_instruction(instruction inst){
       }
     case CPU::i_srl:
       {
-        regfile[rd] = regfile[rs1] >> regfile[rs2] & 0x1F;
+        regfile[rd] = regfile[rs1] >> (regfile[rs2] & 0x1F);
         pc += 4;
         break;
       }
     case CPU::i_sra:
       {
-        regfile[rd] = static_cast<int32_t>(regfile[rs1]) >> regfile[rs2] & 0x1F;
+        regfile[rd] = static_cast<int32_t>(regfile[rs1]) >> (regfile[rs2] & 0x1F);
         pc += 4;
         break;
       }
