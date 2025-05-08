@@ -27,6 +27,7 @@ private:
     i_beq, i_bne, i_blt, i_bge, i_bltu, i_bgeu,
     i_sb, i_sh, i_sw,
     i_fence, i_fence_i, i_ecall, i_ebreak,
+    i_mul, i_mulh, i_mulhsu, i_mulhu, i_div, i_divu, i_rem, i_remu,
     i_invalid_instruction
   };
 

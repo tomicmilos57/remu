@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include <cstdint>
 #include <iostream>
 #include <iomanip>
 
@@ -327,6 +328,69 @@ void CPU::execute_instruction(instruction inst){
         break;
       }
   
+    case CPU::i_mul:
+      {
+        regfile[rd] = regfile[rs1] * regfile[rs2];
+        pc += 4;
+        break;
+      }
+    case CPU::i_mulh:
+      {
+        regfile[rd] = ((int64_t)((int32_t)regfile[rs1]) * (int64_t)((int32_t)regfile[rs2])) >> 32;
+        pc += 4;
+        break;
+      }
+    case CPU::i_mulhsu:
+      {
+        regfile[rd] = ((int64_t)((int32_t)regfile[rs1]) * (uint64_t)(regfile[rs2])) >> 32;
+        pc += 4;
+        break;
+      }
+    case CPU::i_mulhu:
+      {
+        regfile[rd] = ((uint64_t)regfile[rs1] * (uint64_t)regfile[rs2]) >> 32;
+        pc += 4;
+        break;
+      }
+    case CPU::i_div:
+      {
+        if(regfile[rs2] == 0)
+          regfile[rd] = 0xFFFFFFFF;
+        else if (static_cast<int32_t>(regfile[rs1]) == INT32_MIN && static_cast<int32_t>(regfile[rs2]) == -1)
+          regfile[rd] = INT32_MIN;
+        else
+          regfile[rd] = static_cast<int32_t>(regfile[rs1]) / static_cast<int32_t>(regfile[rs2]);
+        pc += 4;
+        break;
+      }
+    case CPU::i_divu:
+      {
+        if(regfile[rs2] != 0)
+          regfile[rd] = regfile[rs1] / regfile[rs2];
+        else
+          regfile[rd] = 0xFFFFFFFF;
+        pc += 4;
+        break;
+      }
+    case CPU::i_rem:
+      {
+        if( regfile[rs2] == 0 )
+          regfile[rd] = regfile[rs1]; 
+        else
+          regfile[rd] = ((int32_t)regfile[rs1] == INT32_MIN && (int32_t)regfile[rs2] == -1) ? 0 : ((uint32_t)((int32_t)regfile[rs1] % (int32_t)regfile[rs2]));
+        pc += 4;
+        break;
+      }
+    case CPU::i_remu:
+      {
+        if(regfile[rs2] != 0)
+          regfile[rd] = regfile[rs1] % regfile[rs2];
+        else
+          regfile[rd] = regfile[rs1];
+        pc += 4;
+        break;
+      }
+
     case CPU::i_fence:
       {
 
@@ -390,14 +454,40 @@ CPU::instruction CPU::decode_instruction() {
 
     case 0b0110011:
       switch (funct3) {
-        case 0b000: return (funct7 == 0b0000000) ? i_add : i_sub;
-        case 0b001: return i_sll;
-        case 0b010: return i_slt;
-        case 0b011: return i_sltu;
-        case 0b100: return i_xor;
-        case 0b101: return (funct7 == 0b0000000) ? i_srl : i_sra;
-        case 0b110: return i_or;
-        case 0b111: return i_and;
+        case 0b000:
+          if (funct7 == 0b0000000) return i_add;
+          else if (funct7 == 0b0100000) return i_sub;
+          else if (funct7 == 0b0000001) return i_mul;
+          break;
+        case 0b001:
+          if (funct7 == 0b0000000) return i_sll;
+          else if (funct7 == 0b0000001) return i_mulh;
+          break;
+        case 0b010:
+          if (funct7 == 0b0000000) return i_slt;
+          else if (funct7 == 0b0000001) return i_mulhsu;
+          break;
+        case 0b011:
+          if (funct7 == 0b0000000) return i_sltu;
+          else if (funct7 == 0b0000001) return i_mulhu;
+          break;
+        case 0b100:
+          if (funct7 == 0b0000000) return i_xor;
+          else if (funct7 == 0b0000001) return i_div;
+          break;
+        case 0b101:
+          if (funct7 == 0b0000000) return i_srl;
+          else if (funct7 == 0b0100000) return i_sra;
+          else if (funct7 == 0b0000001) return i_divu;
+          break;
+        case 0b110:
+          if (funct7 == 0b0000000) return i_or;
+          else if (funct7 == 0b0000001) return i_rem;
+          break;
+        case 0b111:
+          if (funct7 == 0b0000000) return i_and;
+          else if (funct7 == 0b0000001) return i_remu;
+          break;
       }
       break;
 
