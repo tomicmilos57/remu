@@ -1,6 +1,7 @@
 #ifndef CPU_h
 #define CPU_h
 #include "../MEM/mem.h"
+#include "csr.h"
 #include <cstdint>
 
 class CPU {
@@ -10,6 +11,7 @@ public:
   CPU(MEM& memory, uint32_t pc);
 
   bool execute();
+  bool handle_interrupt();
   void info_registers();
   void info_pc();
   void info_ir();
@@ -26,8 +28,10 @@ private:
     i_add, i_sub, i_sll, i_slt, i_sltu, i_xor, i_srl, i_sra, i_or, i_and,
     i_beq, i_bne, i_blt, i_bge, i_bltu, i_bgeu,
     i_sb, i_sh, i_sw,
-    i_fence, i_fence_i, i_ecall, i_ebreak,
     i_mul, i_mulh, i_mulhsu, i_mulhu, i_div, i_divu, i_rem, i_remu,
+    i_fence, i_fence_i,
+    i_ecall, i_ebreak, i_mret, i_sret, i_uret,
+    i_csrrw, i_csrrs,  i_csrrc,  i_csrrwi, i_csrrsi, i_csrrci,
     i_invalid_instruction
   };
 
@@ -35,11 +39,18 @@ private:
   uint32_t pc = 0x00000000;
   uint32_t ir = 0;
   uint32_t instruction_number = 0;
+  uint32_t mode = 0;
+  uint32_t trap_cause = 0;
 
   uint32_t regfile[32] = {};
 
+  CSR csr;
+
   instruction decode_instruction();
   void execute_instruction(instruction inst);
+  void handle_s_interrupt();
+  void handle_m_interrupt();
 };
+
 
 #endif

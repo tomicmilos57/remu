@@ -1,5 +1,4 @@
 #include "cpu.h"
-#include <cstdint>
 #include <iostream>
 #include <iomanip>
 
@@ -81,6 +80,8 @@ void CPU::execute_instruction(instruction inst){
 
 	uint32_t imm_branch = ((ir & 0xf00)>>7) | ((ir & 0x7e000000)>>20) | ((ir & 0x80) << 4) | ((ir >> 31)<<12);
 	if( imm_branch & 0x1000 ) imm_branch |= 0xffffe000;
+
+	uint32_t csr_sel = ir >> 20;
 
   switch (inst) {
     case CPU::i_lui:
@@ -393,19 +394,104 @@ void CPU::execute_instruction(instruction inst){
 
     case CPU::i_fence:
       {
-
+        pc += 4;
+        break;
       }
     case CPU::i_fence_i:
       {
-
+        pc += 4;
+        break;
       }
+
     case CPU::i_ecall:
       {
+        if (mode == 0) trap_cause = 8;
+        else if (mode == 1) trap_cause = 9;
+        else{
+          printf("ecall from M mode");
+          exit(-1);
+        }
 
+        pc += 4;
+        break;
       }
     case CPU::i_ebreak:
       {
+        trap_cause = 3;
 
+        pc += 4;
+        break;
+      }
+
+    case CPU::i_mret:
+      {
+        pc += 4;
+        break;
+      }
+    case CPU::i_sret:
+      {
+        pc += 4;
+        break;
+      }
+    case CPU::i_uret:
+      {
+        pc += 4;
+        break;
+      }
+
+    case CPU::i_csrrw:
+      {
+        uint32_t temp = csr.read(csr_sel);
+        csr.set(csr_sel, regfile[rs1]);
+        regfile[rd] = temp;
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_csrrs:
+      {
+        uint32_t temp = csr.read(csr_sel);
+        csr.set(csr_sel, temp | regfile[rs1]);
+        regfile[rd] = temp;
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_csrrc:
+      {
+        uint32_t temp = csr.read(csr_sel);
+        csr.set(csr_sel, temp & ~regfile[rs1]);
+        regfile[rd] = temp;
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_csrrwi:
+      {
+        uint32_t temp = csr.read(csr_sel);
+        csr.set(csr_sel, rs1);
+        regfile[rd] = temp;
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_csrrsi:
+      {
+        uint32_t temp = csr.read(csr_sel);
+        csr.set(csr_sel, temp | rs1);
+        regfile[rd] = temp;
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_csrrci:
+      {
+        uint32_t temp = csr.read(csr_sel);
+        csr.set(csr_sel, temp & ~rs1);
+        regfile[rd] = temp;
+
+        pc += 4;
+        break;
       }
   
     case CPU::i_invalid_instruction:
@@ -415,6 +501,89 @@ void CPU::execute_instruction(instruction inst){
   }
 }
 
+bool CPU::handle_interrupt(){
+
+  if(trap_cause == 0) return false;
+  // -------------------
+  // ECALL Exception
+  // -------------------
+  else if (trap_cause == 8 || trap_cause == 9) {
+  // -------------------
+    if (csr.medeleg & (1 << 11)) {
+      handle_s_interrupt();
+    } else {
+      handle_m_interrupt();
+    }
+  }
+
+  // -------------------
+  // EBREAK Exception
+  // -------------------
+  else if (trap_cause == 3) {
+    if (csr.medeleg & (1 << 3)) {
+      handle_s_interrupt();
+    } else {
+      handle_m_interrupt();
+    }
+  }
+
+  // -------------------
+  // Timer Interrupt
+  // -------------------
+  else if (trap_cause == 0x80000001) {
+    if (csr.mideleg & (1 << 7)) {
+      if ((csr.sie & (1 << 7)) && (csr.sstatus & (1 << 1))) {
+        handle_s_interrupt();
+      }
+    } else {
+      if ((csr.mie & (1 << 7)) && (csr.mstatus & (1 << 3))) {
+        handle_m_interrupt();
+      }
+    }
+  }
+
+  // -------------------
+  // Unsupported Interrupt
+  // -------------------
+  else {
+    printf("Unsupported Interrupt\n");
+    exit(-1);
+  }
+
+  return true;
+}
+
+void CPU::handle_s_interrupt(){
+  uint32_t new_sstatus =
+    (csr.sstatus & 0xFFFFFE00)
+    | ((mode & 0x1) << 8)
+    | (csr.sstatus & 0x000000C0)
+    | ((csr.sstatus & (1 << 1)) << 6)
+    | ((csr.sstatus & 0x0000001C) << 1)
+    | (0 << 2)
+    | (csr.sstatus & 0x1);
+
+  csr.sstatus = new_sstatus;
+  csr.sepc = pc;
+  csr.scause = trap_cause;
+  pc = csr.stvec;
+}
+
+void CPU::handle_m_interrupt(){
+  uint32_t new_mstatus =
+      (csr.mstatus & 0xFFFFE000)
+    | ((mode & 0x3) << 11)
+    | (csr.mstatus & 0x00000700)
+    | ((csr.mstatus & (1 << 3)) << 8)
+    | ((csr.mstatus & 0x00000070) << 1)
+    | (0 << 4)
+    | (csr.mstatus & 0x7);
+
+  csr.sstatus = new_mstatus;
+  csr.mepc = pc;
+  csr.mcause = trap_cause;
+  pc = csr.mtvec;
+}
 
 CPU::instruction CPU::decode_instruction() {
   uint32_t opcode = ir & 0x7F;
@@ -513,14 +682,29 @@ CPU::instruction CPU::decode_instruction() {
     case 0b0001111: // Fence
       switch (funct3) {
         case 0b000: return i_fence;
-        case 0b001: return i_fence;
+        case 0b001: return i_fence_i;
       }
       break;
 
-    case 0b1110011: // System
-      if ((ir >> 20) == 0) return i_ecall;
-      else if ((ir >> 20) == 1) return i_ebreak;
+    case 0b1110011: { // SYSTEM
+      uint32_t csr_imm = (ir >> 20) & 0xFFF;
+    
+      if (csr_imm == 0x000) return i_ecall;
+      else if (csr_imm == 0x001) return i_ebreak;
+      else if (csr_imm == 0x302) return i_mret;
+      else if (csr_imm == 0x102) return i_sret;
+      else if (csr_imm == 0x002) return i_uret;
+    
+      switch (funct3) {
+        case 0b001: return i_csrrw;
+        case 0b010: return i_csrrs;
+        case 0b011: return i_csrrc;
+        case 0b101: return i_csrrwi;
+        case 0b110: return i_csrrsi;
+        case 0b111: return i_csrrci;
+      }
       break;
+    }
   }
 
   return i_invalid_instruction;
