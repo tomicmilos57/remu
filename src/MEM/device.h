@@ -4,7 +4,7 @@
 #include <fstream>
 #include <string>
 
-struct Device {
+class Device {
   public:
     virtual uint8_t  fetch_byte(uint32_t address);
     virtual uint16_t fetch_half(uint32_t address);
@@ -20,13 +20,12 @@ struct Device {
   protected:
     uint8_t *memory;
     int size = 0;
-    uint32_t base = 0;
 };
 
 class RAM : public Device{
   public:
-    RAM(int size, std::string filename, uint32_t base);
-    RAM(int size, uint32_t base);
+    RAM(int size, std::string filename);
+    RAM(int size);
 
   private:
 };
@@ -34,8 +33,8 @@ class RAM : public Device{
 
 class GPU : public Device{
   public:
-    GPU(uint32_t base);
-    GPU(std::string filename, uint32_t base);
+    GPU();
+    GPU(std::string filename);
 
   private:
 };
