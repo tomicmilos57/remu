@@ -4,7 +4,7 @@
 
 int main(){
 
-  RAM ram_memory(8*1024*1024, "misc/test.bin");
+  RAM ram_memory(8*1024*1024, "misc/09_csr.bin");
   GPU gpu_memory;
   MEM mem_map;
   mem_map.register_device(ram_memory, 0x00000000);
@@ -16,14 +16,15 @@ int main(){
   CPU cpu(mem_map, 0x00000000);
 
   int count = 0;
-  while (count < 16200) {
+  while (count < 20) {
     cpu.execute();
     cpu.handle_interrupt();
-    //std::cout << "Instruction number: ";
+    std::cout << "Instruction number: ";
+    cpu.info_instruction_number();
     //cpu.info_pc();
-    //cpu.info_instruction_number();
     //cpu.info_ir();
-    //cpu.info_registers();
+    cpu.info_registers();
+    cpu.info_csr_registers();
     count++;
   }
   cpu.info_unpriv_test();

@@ -21,16 +21,45 @@ bool CPU::execute(){
 void CPU::info_registers(){
 
     std::cout << "PC: 0x"
-              << std::hex << std::setw(8) << std::setfill('0') << pc << std::endl;
+              << std::hex << std::setw(8) << std::setfill(' ') << pc << std::endl;
 
     std::cout << "IR: 0x"
-              << std::hex << std::setw(8) << std::setfill('0') << ir << std::endl;
+              << std::hex << std::setw(8) << std::setfill(' ') << ir << std::endl;
 
     for (int i = 0; i < 32; ++i) {
-    std::cout << "x" << std::setw(2) << std::setfill('0') << i << ": 0x"
-      << std::hex << std::setw(8) << std::setfill('0') << regfile[i]
-      << std::dec << std::endl;
+    std::cout << "x" << std::setw(2) << std::setfill(' ') << i << ": 0x"
+      << std::hex << std::setw(8)<< regfile[i] << std::dec << std::endl;
   }
+}
+
+void CPU::info_csr_registers(){
+  std::cout << "CSR Registers:\n";
+
+  auto print_csr = [](const std::string& name, uint32_t value) {
+    std::cout << std::left << std::setw(12) << std::setfill(' ') << name << ": 0x"
+      << std::hex << std::setw(8) << value<< std::dec << std::endl;
+  };
+
+  print_csr("mhartid",    csr.mhartid);
+  print_csr("mstatus",    csr.mstatus);
+  print_csr("mepc",       csr.mepc);
+  print_csr("sstatus",    csr.sstatus);
+  print_csr("sip",        csr.sip);
+  print_csr("sie",        csr.sie);
+  print_csr("mie",        csr.mie);
+  print_csr("sepc",       csr.sepc);
+  print_csr("medeleg",    csr.medeleg);
+  print_csr("mideleg",    csr.mideleg);
+  print_csr("stvec",      csr.stvec);
+  print_csr("mtvec",      csr.mtvec);
+  print_csr("satp",       csr.satp);
+  print_csr("scause",     csr.scause);
+  print_csr("mcause",     csr.mcause);
+  print_csr("stval",      csr.stval);
+  print_csr("mcounter",   csr.mcounter);
+  print_csr("time",       csr.time);
+  print_csr("sscratch",   csr.sscratch);
+  print_csr("mscratch",   csr.mscratch);
 }
 
 void CPU::info_pc(){

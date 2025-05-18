@@ -13,6 +13,7 @@ public:
   bool execute();
   bool handle_interrupt();
   void info_registers();
+  void info_csr_registers();
   void info_pc();
   void info_ir();
   void info_instruction_number();
