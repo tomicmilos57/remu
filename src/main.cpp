@@ -4,7 +4,7 @@
 
 int main(){
 
-  RAM ram_memory(8*1024*1024, "misc/09_csr.bin");
+  RAM ram_memory(8*1024*1024, "misc/kernel.bin");
   GPU gpu_memory;
   MEM mem_map;
   mem_map.register_device(ram_memory, 0x00000000);
@@ -16,7 +16,7 @@ int main(){
   CPU cpu(mem_map, 0x00000000);
 
   int count = 0;
-  while (count < 20) {
+  while (count < 100) {
     cpu.execute();
     cpu.handle_interrupt();
     std::cout << "Instruction number: ";

@@ -21,13 +21,13 @@ bool CPU::execute(){
 void CPU::info_registers(){
 
     std::cout << "PC: 0x"
-              << std::hex << std::setw(8) << std::setfill(' ') << pc << std::endl;
+              << std::hex << std::setw(8) << std::setfill('0') << pc << std::endl;
 
     std::cout << "IR: 0x"
-              << std::hex << std::setw(8) << std::setfill(' ') << ir << std::endl;
+              << std::hex << std::setw(8) << std::setfill('0') << ir << std::endl;
 
     for (int i = 0; i < 32; ++i) {
-    std::cout << "x" << std::setw(2) << std::setfill(' ') << i << ": 0x"
+    std::cout << "x" << std::setw(2) << std::setfill('0') << i << ": 0x"
       << std::hex << std::setw(8)<< regfile[i] << std::dec << std::endl;
   }
 }
@@ -36,8 +36,8 @@ void CPU::info_csr_registers(){
   std::cout << "CSR Registers:\n";
 
   auto print_csr = [](const std::string& name, uint32_t value) {
-    std::cout << std::left << std::setw(12) << std::setfill(' ') << name << ": 0x"
-      << std::hex << std::setw(8) << value<< std::dec << std::endl;
+    std::cout << std::left << std::setw(12) << std::setfill(' ') << name << std::setfill('0') << std::right << ": 0x"
+      << std::hex << std::setw(8) << value << std::dec << std::endl;
   };
 
   print_csr("mhartid",    csr.mhartid);
