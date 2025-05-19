@@ -455,17 +455,24 @@ void CPU::execute_instruction(instruction inst){
 
     case CPU::i_mret:
       {
-        pc += 4;
+        mode = (csr.mstatus >> 11) & 0x3;
+        uint32_t new_ret_mstatus = (csr.mstatus & 0xFFFFFFF0) | ((csr.mstatus >> 7) & 0x1) << 3 | (csr.mstatus & 0x7);
+        csr.mstatus = new_ret_mstatus;
+        pc = csr.mepc;
         break;
       }
     case CPU::i_sret:
       {
-        pc += 4;
+        mode = ((csr.sstatus >> 8) & 0x1);
+        uint32_t new_ret_sstatus = (csr.sstatus & 0xFFFFFFFC) | ((csr.sstatus >> 5) & 0x1) << 1 | (csr.sstatus & 0x1);     
+        csr.sstatus = new_ret_sstatus;
+        pc = csr.sepc;
         break;
       }
     case CPU::i_uret:
       {
-        pc += 4;
+        std::cout << "URET CALLED: Exiting" << std::endl;
+        exit(-1);
         break;
       }
 
@@ -717,13 +724,12 @@ CPU::instruction CPU::decode_instruction() {
       break;
 
     case 0b1110011: { // SYSTEM
-      uint32_t csr_imm = (ir >> 20) & 0xFFF;
     
-      if (csr_imm == 0x000) return i_ecall;
-      else if (csr_imm == 0x001) return i_ebreak;
-      else if (csr_imm == 0x302) return i_mret;
-      else if (csr_imm == 0x102) return i_sret;
-      else if (csr_imm == 0x002) return i_uret;
+      if (ir == 0b00000000000000000000000001110011) return i_ecall;
+      else if (ir == 0b00000000000100000000000001110011) return i_ebreak;
+      else if (ir == 0b00110000001000000000000001110011) return i_mret;
+      else if (ir == 0b00010000001000000000000001110011) return i_sret;
+      else if (ir == 0b00000000001000000000000001110011) return i_uret;
     
       switch (funct3) {
         case 0b001: return i_csrrw;
