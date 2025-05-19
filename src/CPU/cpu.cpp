@@ -137,8 +137,9 @@ void CPU::execute_instruction(instruction inst){
       }
     case CPU::i_jalr:
       {
-        regfile[rd] = pc + 4;
-				pc = ((regfile[rs1] + imm_se) & ~1);
+        uint32_t old_pc = pc;
+				pc = ((regfile[rs1] + imm_se) & ~1U);
+        regfile[rd] = old_pc + 4;
         break;
       }
   
