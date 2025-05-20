@@ -1,3 +1,5 @@
 misc/kernel.bin
 misc/objdump.txt
+build/*
 log.txt
+main
