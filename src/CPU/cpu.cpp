@@ -537,6 +537,106 @@ void CPU::execute_instruction(instruction inst){
         break;
       }
   
+    case CPU::i_amoswap_w:
+      {
+        uint32_t address = regfile[rs1];
+        uint32_t value2 = regfile[rs2];
+        uint32_t value_from_mem = memory.fetch_word(address);
+        regfile[rd] = value_from_mem;
+        memory.store_word(address, value2);
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_amoadd_w:
+      {
+        uint32_t address = regfile[rs1];
+        uint32_t value2 = regfile[rs2];
+        uint32_t value_from_mem = memory.fetch_word(address);
+        regfile[rd] = value_from_mem;
+        memory.store_word(address, value_from_mem + value2);
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_amoxor_w:
+      {
+        uint32_t address = regfile[rs1];
+        uint32_t value2 = regfile[rs2];
+        uint32_t value_from_mem = memory.fetch_word(address);
+        regfile[rd] = value_from_mem;
+        memory.store_word(address, value_from_mem ^ value2);
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_amoand_w:
+      {
+        uint32_t address = regfile[rs1];
+        uint32_t value2 = regfile[rs2];
+        uint32_t value_from_mem = memory.fetch_word(address);
+        regfile[rd] = value_from_mem;
+        memory.store_word(address, value_from_mem & value2);
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_amoor_w:
+      {
+        uint32_t address = regfile[rs1];
+        uint32_t value2 = regfile[rs2];
+        uint32_t value_from_mem = memory.fetch_word(address);
+        regfile[rd] = value_from_mem;
+        memory.store_word(address, value_from_mem | value2);
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_amomin_w:
+      {
+        uint32_t address = regfile[rs1];
+        uint32_t value2 = regfile[rs2];
+        uint32_t value_from_mem = memory.fetch_word(address);
+        regfile[rd] = value_from_mem;
+        memory.store_word(address, (int32_t)value_from_mem < (int32_t)value2 ? value_from_mem : value2);
+
+        pc += 4;
+        break;
+      } 
+    case CPU::i_amomax_w:
+      {
+        uint32_t address = regfile[rs1];
+        uint32_t value2 = regfile[rs2];
+        uint32_t value_from_mem = memory.fetch_word(address);
+        regfile[rd] = value_from_mem;
+        memory.store_word(address, (int32_t)value_from_mem > (int32_t)value2 ? value_from_mem : value2);
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_amominu_w:
+      {
+        uint32_t address = regfile[rs1];
+        uint32_t value2 = regfile[rs2];
+        uint32_t value_from_mem = memory.fetch_word(address);
+        regfile[rd] = value_from_mem;
+        memory.store_word(address, value_from_mem < value2 ? value_from_mem : value2);
+
+        pc += 4;
+        break;
+      }
+    case CPU::i_amomaxu_w:
+      {
+        uint32_t address = regfile[rs1];
+        uint32_t value2 = regfile[rs2];
+        uint32_t value_from_mem = memory.fetch_word(address);
+        regfile[rd] = value_from_mem;
+        memory.store_word(address, value_from_mem > value2 ? value_from_mem : value2);
+
+        pc += 4;
+        break;
+      }
+
     case CPU::i_invalid_instruction:
       {
 
@@ -747,7 +847,26 @@ CPU::instruction CPU::decode_instruction() {
       }
       break;
     }
+    case 0b0101111: //Atomic instructions
+      if (funct3 == 0b010) {
+        uint32_t funct5 = (funct7 >> 2) & 0x1F;
+        switch (funct5) {
+//          case 0b00010: return i_lr_w;
+//          case 0b00011: return i_sc_w;
+          case 0b00001: return i_amoswap_w;
+          case 0b00000: return i_amoadd_w;
+          case 0b00100: return i_amoxor_w;
+          case 0b01100: return i_amoand_w;
+          case 0b01000: return i_amoor_w;
+          case 0b10000: return i_amomin_w;
+          case 0b10100: return i_amomax_w;
+          case 0b11000: return i_amominu_w;
+          case 0b11100: return i_amomaxu_w;
+        }
+      }
+      break;
   }
-
+  printf("CPU: INVALID INSTRUCTION\n");
+  exit(-1);
   return i_invalid_instruction;
 }

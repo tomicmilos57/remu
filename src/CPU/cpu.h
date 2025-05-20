@@ -36,6 +36,8 @@ private:
     i_fence, i_fence_i,
     i_ecall, i_ebreak, i_mret, i_sret, i_uret,
     i_csrrw, i_csrrs,  i_csrrc,  i_csrrwi, i_csrrsi, i_csrrci,
+    i_amoswap_w, i_amoadd_w, i_amoxor_w, i_amoand_w,
+    i_amoor_w, i_amomin_w, i_amomax_w, i_amominu_w, i_amomaxu_w,
     i_invalid_instruction
   };
 

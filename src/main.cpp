@@ -1,4 +1,5 @@
 #include "MEM/mem.h"
+#include "MEM/uart.h"
 #include "CPU/cpu.h"
 #include <iostream>
 
@@ -13,18 +14,20 @@ int main(){
   RAM test_memory(1024);
   mem_map.register_device(test_memory, 0x60000000);
 
+  UART uart;
+  mem_map.register_device(uart, 0x10000000);
   CPU cpu(mem_map, 0x80000000);
 
-  int count = 0;
-  while (count < 100) {
+  //int count = 0;
+  while (true) {
     cpu.execute();
     cpu.handle_interrupt();
-    cpu.info_instruction_number();
+    //cpu.info_instruction_number();
     //cpu.info_pc();
     //cpu.info_ir();
-    cpu.info_registers();
-    cpu.info_csr_registers();
-    count++;
+    //cpu.info_registers();
+    //cpu.info_csr_registers();
+    //count++;
   }
   //cpu.info_unpriv_test();
 
