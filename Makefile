@@ -23,6 +23,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+# Build and run the application
+run: all
+	./$(BIN)
+
 # Clean build files
 clean:
 	rm -rf $(OBJ_DIR) $(BIN)

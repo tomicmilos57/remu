@@ -3,12 +3,15 @@
 #include "../MEM/mem.h"
 #include "csr.h"
 #include <cstdint>
+#include <string>
+#include <fstream>
 
 class CPU {
 
 public:
   CPU(MEM& memory);
   CPU(MEM& memory, uint32_t pc);
+  ~CPU();
 
   bool execute();
   bool handle_interrupt();
@@ -42,6 +45,8 @@ private:
   uint32_t instruction_number = 0;
   uint32_t mode = 0;
   uint32_t trap_cause = 0;
+
+  std::ofstream ofile;
 
   uint32_t regfile[32] = {};
 
