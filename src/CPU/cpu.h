@@ -33,7 +33,7 @@ private:
     i_beq, i_bne, i_blt, i_bge, i_bltu, i_bgeu,
     i_sb, i_sh, i_sw,
     i_mul, i_mulh, i_mulhsu, i_mulhu, i_div, i_divu, i_rem, i_remu,
-    i_fence, i_fence_i,
+    i_fence, i_fence_i, i_sfence_vma, i_wfi,
     i_ecall, i_ebreak, i_mret, i_sret, i_uret,
     i_csrrw, i_csrrs,  i_csrrc,  i_csrrwi, i_csrrsi, i_csrrci,
     i_amoswap_w, i_amoadd_w, i_amoxor_w, i_amoand_w,

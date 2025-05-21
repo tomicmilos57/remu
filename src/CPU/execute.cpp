@@ -338,6 +338,16 @@ void CPU::execute_instruction(instruction inst){
         pc += 4;
         break;
       }
+    case CPU::i_sfence_vma:
+      {
+        pc += 4;
+        break;
+      }
+    case CPU::i_wfi:
+      {
+        pc += 4;
+        break;
+      }
 
     case CPU::i_ecall:
       {

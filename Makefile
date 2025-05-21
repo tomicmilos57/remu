@@ -24,7 +24,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Build and run the application
-run: all
+remu: all
 	./$(BIN)
 
 # Clean build files

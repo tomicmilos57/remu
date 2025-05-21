@@ -294,6 +294,8 @@ CPU::instruction CPU::decode_instruction() {
       else if (ir == 0b00110000001000000000000001110011) return i_mret;
       else if (ir == 0b00010000001000000000000001110011) return i_sret;
       else if (ir == 0b00000000001000000000000001110011) return i_uret;
+      else if (ir == 0x10500073) return i_wfi;
+      else if ((funct7 == 0b0001001) && (funct3 == 0b000)) return i_sfence_vma;
     
       switch (funct3) {
         case 0b001: return i_csrrw;
