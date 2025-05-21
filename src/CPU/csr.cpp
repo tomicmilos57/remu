@@ -15,7 +15,12 @@ void CSR::set(uint32_t sel, uint32_t value) {
         case 0x303: mideleg = value; break;
         case 0x105: stvec = value; break;
         case 0x305: mtvec = value; break;
-        case 0x180: satp = value; break;
+        case 0x180:
+          {
+            satp = value;
+            memory.set_satp(satp);
+            break;
+          }
         case 0x142: scause = value; break;
         case 0x342: mcause = value; break;
         case 0x143: stval = value; break;

@@ -2,10 +2,10 @@
 #include <iostream>
 #include <iomanip>
 
-CPU::CPU(MEM& memory) : memory(memory) {
+CPU::CPU(MEM& memory) : memory(memory), csr(CSR(memory)) {
   ofile.open("log.txt");
 }
-CPU::CPU(MEM& memory, uint32_t pc) : memory(memory), pc(pc) {
+CPU::CPU(MEM& memory, uint32_t pc) : memory(memory), pc(pc), csr(CSR(memory)) {
   ofile.open("log.txt");
 }
 CPU::~CPU(){
@@ -324,7 +324,7 @@ CPU::instruction CPU::decode_instruction() {
       }
       break;
   }
-  printf("CPU: INVALID INSTRUCTION\n");
+  printf("CPU: INVALID INSTRUCTION: %x\n", ir);
   exit(-1);
   return i_invalid_instruction;
 }

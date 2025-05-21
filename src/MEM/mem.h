@@ -17,6 +17,9 @@ class MEM {
     void store_half(uint32_t address, uint16_t half);
     void store_word(uint32_t address, uint32_t word);
 
+    void set_satp(uint32_t satp);
+    uint32_t resolve_address(uint32_t vaddr);
+
     ~MEM();
   private:
     class Module{
@@ -27,6 +30,7 @@ class MEM {
     };
     std::vector<Module*> registered_devices;
     Module* get_device(uint32_t address);
+    uint32_t satp = 0;
 };
 
 #endif

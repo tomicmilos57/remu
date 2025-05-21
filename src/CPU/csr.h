@@ -1,9 +1,11 @@
 #ifndef CSR_h
 #define CSR_h
 #include <cstdint>
+#include "../MEM/mem.h"
 
 class CSR{
   public:
+    CSR(MEM& memory) : memory(memory) {}
     void set(uint32_t sel, uint32_t value);
     uint32_t read(uint32_t sel) const;
 
@@ -27,6 +29,8 @@ class CSR{
     uint32_t time = 0;
     uint32_t sscratch = 0;
     uint32_t mscratch = 0;
+  private:
+    MEM& memory;
 };
 
 #endif
