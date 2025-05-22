@@ -102,6 +102,11 @@ void CPU::info_unpriv_test(){
   }
 }
 
+void CPU::external_interrupt(){
+  trap_cause = 0x80000009;
+  handle_interrupt();
+}
+
 bool CPU::handle_interrupt(){
 
   if(trap_cause == 0) return false;
@@ -124,6 +129,18 @@ bool CPU::handle_interrupt(){
     if (csr.medeleg & (1 << 3)) {
       handle_s_interrupt();
     } else {
+      handle_m_interrupt();
+    }
+  }
+
+  // -------------------
+  // Supervisor External Interrupt
+  // -------------------
+  else if (trap_cause == 0x80000009) {
+    if ((csr.mideleg & (1 << 9)) && (csr.sstatus & (1 << 1)) && (csr.sie & (1 << 9))) {
+      handle_s_interrupt();
+    }
+    else if ((csr.mstatus & (1 << 3)) && (csr.mie & (1 << 9))) {
       handle_m_interrupt();
     }
   }

@@ -11,6 +11,7 @@ class UART : public Device{
     void store_byte(uint32_t address, uint8_t value) override;
     uint8_t fetch_byte(uint32_t address) override;
 
+    void send_char(char c);
   private:
 };
 

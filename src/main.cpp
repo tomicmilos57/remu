@@ -1,6 +1,8 @@
 #include "MEM/mem.h"
 #include "MEM/uart.h"
+#include "MEM/plic.h"
 #include "CPU/cpu.h"
+#include "HW/console.h"
 #include <iostream>
 
 int main(){
@@ -16,10 +18,23 @@ int main(){
 
   UART uart;
   mem_map.register_device(uart, 0x10000000);
+
+  RAM virtio(1024*1024);
+  mem_map.register_device(virtio, 0x10001000);
+
   CPU cpu(mem_map, 0x80000000);
 
-  //int count = 0;
+  PLIC plic(cpu);
+  mem_map.register_device(plic, 0x0c000000);
+
+  Console console(plic, uart);
+
+  int count = 0;
   while (true) {
+    if(count >= 10000) {
+      console.simulate_input();
+      count = 0;
+    }
     cpu.execute();
     cpu.handle_interrupt();
     //cpu.info_instruction_number();
@@ -27,7 +42,7 @@ int main(){
     //cpu.info_ir();
     //cpu.info_registers();
     //cpu.info_csr_registers();
-    //count++;
+    count++;
   }
   //cpu.info_unpriv_test();
 
