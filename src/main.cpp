@@ -1,6 +1,7 @@
 #include "MEM/mem.h"
 #include "MEM/uart.h"
 #include "MEM/plic.h"
+#include "MEM/sd_card.h"
 #include "CPU/cpu.h"
 #include "HW/console.h"
 #include <iostream>
@@ -19,8 +20,8 @@ int main(){
   UART uart;
   mem_map.register_device(uart, 0x10000000);
 
-  RAM virtio(1024*1024);
-  mem_map.register_device(virtio, 0x10001000);
+  SD_CARD sd_card;
+  mem_map.register_device(sd_card, 0x10001000);
 
   CPU cpu(mem_map, 0x80000000);
 
@@ -33,6 +34,7 @@ int main(){
   while (true) {
     if(count >= 10000) {
       console.simulate_input();
+      sd_card.simulate_sd_card();
       count = 0;
     }
     cpu.execute();
