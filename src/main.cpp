@@ -24,6 +24,7 @@ int main(){
   mem_map.register_device(sd_card, 0x10001000);
 
   CPU cpu(mem_map, 0x80000000);
+  cpu.set_breakpoint(0x80000cbc , 0x80000d04);
 
   PLIC plic(cpu);
   mem_map.register_device(plic, 0x0c000000);
@@ -39,9 +40,9 @@ int main(){
     }
     cpu.execute();
     cpu.handle_interrupt();
-    //cpu.info_instruction_number();
     //cpu.info_pc();
     //cpu.info_ir();
+    //cpu.info_instruction_number();
     //cpu.info_registers();
     //cpu.info_csr_registers();
     count++;

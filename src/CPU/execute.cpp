@@ -379,6 +379,9 @@ void CPU::execute_instruction(instruction inst){
       }
     case CPU::i_sret:
       {
+        ofile << "SRET CALLED: Exiting" << std::endl;
+        info_registers();
+        info_csr_registers();
         mode = ((csr.sstatus >> 8) & 0x1);
         uint32_t new_ret_sstatus = (csr.sstatus & 0xFFFFFFFC) | ((csr.sstatus >> 5) & 0x1) << 1 | (csr.sstatus & 0x1);     
         csr.sstatus = new_ret_sstatus;

@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 #include <fstream>
+#include <vector>
 
 class CPU {
 
@@ -18,9 +19,11 @@ public:
   void info_registers();
   void info_csr_registers();
   void info_pc();
+  uint32_t get_pc();
   void info_ir();
   void info_instruction_number();
   void info_unpriv_test(); // EXPECTS MEMORY ON ADDRESS 0x60000000
+  void set_breakpoint(uint32_t breakpoint_begin, uint32_t breakpoint_end);
 
   void external_interrupt();
 private:
@@ -41,6 +44,14 @@ private:
     i_amoor_w, i_amomin_w, i_amomax_w, i_amominu_w, i_amomaxu_w,
     i_invalid_instruction
   };
+  struct Breakpoint{
+    Breakpoint(uint32_t begin_breakpoint, uint32_t end_breakpoint){
+      begin = begin_breakpoint;
+      end = end_breakpoint;
+    }
+    uint32_t begin;
+    uint32_t end;
+  };
 
   MEM& memory;
   uint32_t pc = 0x00000000;
@@ -54,6 +65,8 @@ private:
   uint32_t regfile[32] = {};
 
   CSR csr;
+
+  std::vector<Breakpoint*> breakpoints;
 
   instruction decode_instruction();
   void execute_instruction(instruction inst);

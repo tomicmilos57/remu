@@ -10,6 +10,9 @@ CPU::CPU(MEM& memory, uint32_t pc) : memory(memory), pc(pc), csr(CSR(memory)) {
 }
 CPU::~CPU(){
   ofile.close();
+  for(auto breakpoint : breakpoints) {
+    delete breakpoint;
+  }
 }
 
 bool CPU::execute(){
@@ -17,7 +20,14 @@ bool CPU::execute(){
   instruction_number++;
 
   CPU::instruction inst = decode_instruction();
+
   regfile[0] = 0;
+  for(auto breakpoint : breakpoints) {
+    if (pc >= breakpoint->begin && pc <= breakpoint->end) {
+      info_registers();
+      info_csr_registers();
+    }
+  }
   execute_instruction(inst);
   regfile[0] = 0;
  
@@ -68,6 +78,9 @@ void CPU::info_csr_registers(){
   print_csr("mscratch",   csr.mscratch, ofile);
 }
 
+uint32_t CPU::get_pc(){
+  return pc;
+}
 void CPU::info_pc(){
   ofile << "PC: 0x" << std::hex << std::setw(8) << std::setfill('0') << pc << std::endl;
 }
@@ -100,6 +113,9 @@ void CPU::info_unpriv_test(){
     ofile << "TEST " << std::dec << i  << " " << test_names[i] << " " << passed << ": 0x" << std::hex << std::setw(8) << std::setfill('0') << memory.fetch_word(0x60000000 + i) << std::endl;
 
   }
+}
+void CPU::set_breakpoint(uint32_t breakpoint_begin, uint32_t breakpoint_end){
+  breakpoints.push_back(new Breakpoint(breakpoint_begin, breakpoint_end));
 }
 
 void CPU::external_interrupt(){
@@ -344,6 +360,9 @@ CPU::instruction CPU::decode_instruction() {
       break;
   }
   printf("CPU: INVALID INSTRUCTION: %x\n", ir);
+  ofile << "CPU: INVALID INSTRUCTION\n";
+  info_registers();
+  info_csr_registers();
   exit(-1);
   return i_invalid_instruction;
 }
