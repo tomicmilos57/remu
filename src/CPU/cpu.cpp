@@ -28,6 +28,7 @@ bool CPU::execute(){
       info_csr_registers();
     }
   }
+
   execute_instruction(inst);
   regfile[0] = 0;
  
@@ -201,6 +202,7 @@ void CPU::handle_s_interrupt(){
   csr.sepc = pc;
   csr.scause = trap_cause;
   pc = csr.stvec;
+  trap_cause = 0;
 }
 
 void CPU::handle_m_interrupt(){
@@ -217,6 +219,7 @@ void CPU::handle_m_interrupt(){
   csr.mepc = pc;
   csr.mcause = trap_cause;
   pc = csr.mtvec;
+  trap_cause = 0;
 }
 
 CPU::instruction CPU::decode_instruction() {

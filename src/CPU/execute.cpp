@@ -358,7 +358,7 @@ void CPU::execute_instruction(instruction inst){
           exit(-1);
         }
 
-        pc += 4;
+        //pc += 4;
         break;
       }
     case CPU::i_ebreak:
@@ -552,7 +552,8 @@ void CPU::execute_instruction(instruction inst){
 
     case CPU::i_invalid_instruction:
       {
-
+        std::cout << "INVALID INSTRUCTION" << std::endl;
+        exit(-2);
       }
   }
 }
