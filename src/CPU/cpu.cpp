@@ -121,7 +121,7 @@ void CPU::set_breakpoint(uint32_t breakpoint_begin, uint32_t breakpoint_end){
 
 void CPU::external_interrupt(){
   trap_cause = 0x80000009;
-  handle_interrupt();
+  //handle_interrupt();
 }
 
 bool CPU::handle_interrupt(){
