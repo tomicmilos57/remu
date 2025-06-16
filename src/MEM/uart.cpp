@@ -18,9 +18,7 @@ void UART::store_byte(uint32_t address, uint8_t value){
   if (address == RHR) {
     std::cout << value;
   }
-  else {
-      memory[address] = value;
-  }
+   memory[address] = value;
 }
 
 void UART::send_char(char c){

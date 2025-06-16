@@ -89,6 +89,9 @@ void CPU::info_ir(){
   ofile << "IR: 0x" << std::hex << std::setw(8) << std::setfill('0') << ir << std::endl;
 }
 
+uint32_t CPU::get_instruction_number(){
+  return instruction_number;
+}
 void CPU::info_instruction_number(){
   ofile << std::dec << "instruction number: " << instruction_number << std::endl;
 }

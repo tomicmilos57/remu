@@ -2,9 +2,9 @@
 #include <iostream>
 
 #define SD_CARD_BUFFER 0x00000000UL
-#define SD_CARD_ADDRESS 0x00000400UL
-#define SD_CARD_OPERATION 0x00000404UL
-#define BSIZE 1024
+#define SD_CARD_ADDRESS 0x00000200UL
+#define SD_CARD_OPERATION 0x00000204UL
+#define BSIZE 512
 
 SD_CARD::SD_CARD(){
   this->size = BSIZE + 4 + 1; //(1024B)Buffer + (4B)Address + (1B)OP
