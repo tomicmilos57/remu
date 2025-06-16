@@ -23,13 +23,22 @@ void PLIC::store_word(uint32_t address, uint32_t value){
 }
 
 uint8_t PLIC::fetch_byte(uint32_t address) {
-  return 10;
+  if (address == 2101252) {
+    return 10;
+  }
+  return 0;
 }
 
 uint16_t PLIC::fetch_half(uint32_t address) {
-  return 10;
+  if (address == 2101252) {
+    return 10;
+  }
+  return 0;
 }
 
 uint32_t PLIC::fetch_word(uint32_t address) {
-  return 10;
+  if (address == 2101252) {
+    return 10;
+  }
+  return 0;
 }
