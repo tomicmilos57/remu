@@ -34,7 +34,7 @@ void SD_CARD::simulate_sd_card(){
   uint8_t request = memory[SD_CARD_OPERATION];
   if(request == 0x01){ //READ
     uint32_t blockno = fetch_local_word(SD_CARD_ADDRESS);
-    uint32_t address = blockno*BSIZE;
+    uint32_t address = blockno;
 
     for (int i = 0; i < BSIZE; i++) {
       memory[i] = disk_memory[address+i];
@@ -44,7 +44,7 @@ void SD_CARD::simulate_sd_card(){
   }
   else if (request == 0x02) { //WRITE
     uint32_t blockno = fetch_local_word(SD_CARD_ADDRESS);
-    uint32_t address = blockno*BSIZE;
+    uint32_t address = blockno;
 
     for (int i = 0; i < BSIZE; i++) {
       disk_memory[address+i] = memory[i];
